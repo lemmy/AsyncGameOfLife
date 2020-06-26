@@ -82,7 +82,7 @@ Spec == Init /\ [][Next]_vars
 -------------------------------------------------------
 
 \* TLC evaluates this eagerly at start as part of constant processing to
-\* prevent races in value instances during model-checking..ss
+\* prevent races in value instances during model-checking.
 \*SomeConfiguration ==
 \*  CHOOSE init \in [Pos -> ({TRUE} \X {FALSE} \X R)] : TRUE
 
@@ -94,9 +94,10 @@ BlockN ==
   4
   
 Block ==
-  [pos \in Pos |-> IF pos \in {<<2,2>>,<<2,3>>,<<3,2>>,<<3,3>>}
+   /\ grid = [pos \in Pos |-> IF pos \in {<<2,2>>,<<2,3>>,<<3,2>>,<<3,3>>}
                    THEN <<TRUE, TRUE, 0>>
-                   ELSE <<FALSE, FALSE, 0>>]
+                   ELSE <<FALSE, FALSE, 0>>]  
+  /\ [][Next]_grid
                    
 \* r keeps changing, but q doesn't because Block is a still life.
 BlockInv ==
@@ -108,7 +109,10 @@ BlockInv ==
           /\ grid[pos][1] = TRUE
           /\ grid[pos][2] = TRUE
           /\ grid[pos][3] \in R
-  
+
+BlockDiameter == 
+  31
+
 \* https://en.wikipedia.org/wiki/File:Game_of_life_beehive.svg
 Beehive ==
   TRUE
@@ -132,9 +136,11 @@ BlinkerN ==
   5
   
 Blinker ==
-  [ pos \in Pos |-> IF pos \in {<<3,2>>,<<3,3>>,<<3,4>>}
+  /\ grid = [ pos \in Pos |-> IF pos \in {<<3,2>>,<<3,3>>,<<3,4>>}
                     THEN <<TRUE, TRUE, 0>>
                     ELSE <<FALSE, FALSE, 0>> ]
+  /\ [][Next]_grid
+
 
 \* In an ordinay Cellular Automata it would be easy to formulate
 \* an invariant for oscillators (list of valid grid states). With
@@ -152,5 +158,5 @@ BlinkerInv ==
   
 =============================================================================
 \* Modification History
-\* Last modified Thu Jun 18 16:22:20 PDT 2020 by markus
+\* Last modified Thu Jun 25 22:06:55 PDT 2020 by markus
 \* Created Wed Jun 17 13:56:15 PDT 2020 by markus
