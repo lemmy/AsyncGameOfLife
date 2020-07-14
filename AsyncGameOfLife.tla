@@ -73,9 +73,6 @@ deltaP(v, q, qP, r, Neighbors) ==
 
 Next ==
   \E v \in Pos: /\ deltaP(v, grid[v][1], grid[v][2], grid[v][3], nbhd(v))
-\*                \* Print current grid to stdout (this become huge). 
-\*                /\ LET TLC == INSTANCE TLC
-\*                   IN TLC!PrintT(grid)
 
 Spec == Init /\ [][Next]_vars
 
@@ -144,7 +141,7 @@ Blinker ==
 
 \* In an ordinay Cellular Automata it would be easy to formulate
 \* an invariant for oscillators (list of valid grid states). With
-\* the asynchronous CA the state changes in waves, which makes it
+\* the asynchronous CA the state changes in "waves", which makes it
 \* tedious to enumerate all valid grid states).  This is why the
 \* invariant below is not as strong as it should be (it only 
 \* checks quiescent cells but ignores cells that oscillate.
