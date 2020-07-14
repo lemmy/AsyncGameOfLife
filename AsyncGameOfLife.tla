@@ -152,8 +152,19 @@ BlinkerInv ==
           /\ grid[pos][1] = FALSE
           /\ grid[pos][2] = FALSE
           /\ grid[pos][3] \in R
+
+\* Glider
+
+\* https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#/media/File:Game_of_life_animated_glider.gif
+GliderN ==
+  5
   
+Glider == 
+  \* From top-left.
+  /\ grid = [ pos \in Pos |-> IF pos \in {<<1,3>>,<<2,1>>,<<2,3>>,<<3,2>>,<<3,3>>}
+                    THEN <<TRUE, TRUE, 0>>
+                    ELSE <<FALSE, FALSE, 0>> ]
+  /\ [][Next]_vars
+ 
+
 =============================================================================
-\* Modification History
-\* Last modified Thu Jun 25 22:06:55 PDT 2020 by markus
-\* Created Wed Jun 17 13:56:15 PDT 2020 by markus
