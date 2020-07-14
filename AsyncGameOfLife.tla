@@ -97,7 +97,7 @@ Block ==
    /\ grid = [pos \in Pos |-> IF pos \in {<<2,2>>,<<2,3>>,<<3,2>>,<<3,3>>}
                    THEN <<TRUE, TRUE, 0>>
                    ELSE <<FALSE, FALSE, 0>>]  
-  /\ [][Next]_grid
+  /\ [][Next]_vars
                    
 \* r keeps changing, but q doesn't because Block is a still life.
 BlockInv ==
@@ -139,7 +139,7 @@ Blinker ==
   /\ grid = [ pos \in Pos |-> IF pos \in {<<3,2>>,<<3,3>>,<<3,4>>}
                     THEN <<TRUE, TRUE, 0>>
                     ELSE <<FALSE, FALSE, 0>> ]
-  /\ [][Next]_grid
+  /\ [][Next]_vars
 
 
 \* In an ordinay Cellular Automata it would be easy to formulate
