@@ -76,7 +76,7 @@ deltaP(v, q, qP, r, Neighbors) ==
   (* v could update its visible state (r = 0) but some of its neighbors are at out of sync (r = 2). *)
   \/ /\ r = 0
      /\ ~ ready(0, Neighbors) \* \E w \in Neighbors: grid[w][3] = 2
-     /\ grid' = [ grid EXCEPT ![v] = <<q, qP, 0>> ]
+     /\ UNCHANGED grid
   (* v is not allowed to change visible state but its neighbors are in sync. *)
   \/ /\ r \in {1,2}
      /\ ready(r, Neighbors)
