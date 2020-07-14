@@ -24,19 +24,6 @@ nbhd(v) ==
   IN { p \in points : /\ p[1] # 0 /\ p[2] # 0   \* Filter out all neighbors
                       /\ p[1]<= N /\ p[2]<= N } \* that are off the grid.
 
-\* Topology modeled as a 2D grid with Moore neighborhood without
-\* "wrap around". We don't model the general case (yet?) where
-\* the topology/neighborhood is given by a graph (network of computers).
-\* Each cell in the grid is a deterministic finite automaton (DFA).
-VARIABLES grid
-vars == <<grid>>
-
-TypeOK == 
-  grid \in [Pos -> (BOOLEAN \X BOOLEAN \X R)]
-
-Init == 
-  grid \in [Pos -> (BOOLEAN \X BOOLEAN \X R)]
-
 (* Original local transition function from the second page and 
    GameOfLife.tla. *)
 delta(b, liveNbgrs) ==
@@ -45,28 +32,57 @@ delta(b, liveNbgrs) ==
   THEN TRUE
   ELSE FALSE
 
+qPP(qw, qwP, rw) == 
+  CASE rw = 0 -> qw \* w in a state of form (q_w,qP_w,0)
+    [] rw = 1 -> qwP \* w in a state of form (q_w,qP_w,1)
+\*    [] OTHER -> FALSE \* Undefined
+
+\* Topology modeled as a 2D grid with Moore neighborhood without
+\* "wrap around". We don't model the general case (yet?) where
+\* the topology/neighborhood is given by a graph (network of computers).
+\* Each cell in the grid is a deterministic finite automaton (DFA).
+VARIABLES grid
+vars == <<grid>>
+
+TypeOK == 
+  (* 1. component of a cell is the cell's (visible) state (alive/dead).      *)
+  (* 2. component of a cell is the cell's previous (visible) state.          *)
+  (* 3. component of a cell is the cell's temporal state (synchronization).  *)
+  (* (see "Temporal Waves" section on page 4 for temporal synchronization)   *)
+  grid \in [Pos -> (BOOLEAN \X BOOLEAN \X R)]
+
+Init == 
+  grid \in [Pos -> (BOOLEAN \X BOOLEAN \X R)]
+
 \* \A r \in R, nbhr \in SUBSET Pos: ready(r, nbhr) \in BOOLEAN
 ready(r, Neighbors) == 
-  \A w \in Neighbors: grid[w][3] # (r + 2) % 3
+  \A w \in Neighbors: grid[w][3] # (r + 2) % 3 \* (0 :> 2 @@ 1 :> 0 @@ 2 :> 1)
 
 qPP(qw, qwP, rw) == 
   CASE rw = 0 -> qw \* w in a state of form (q_w,qP_w,0)
     [] rw = 1 -> qwP \* w in a state of form (q_w,qP_w,1)
 \*    [] OTHER -> FALSE \* Undefined
 
-(* Transition function from third page. *)  
+(* Transition function from third page. *)
 deltaP(v, q, qP, r, Neighbors) ==
   \/ /\ r = 0
-     /\ ready(0, Neighbors) 
+     /\ ready(0, Neighbors)   \* \A w \in Neighbors: grid[w][3] \in {0,1}
      /\ grid' = [ grid EXCEPT ![v] = <<delta(q, 
+                  (* If w is temporarily in sync with v, compute delta from w's current state.  *)
+                  (* If w is one time unit ahead of v, compute delta with w's previous state.   *)
                   {w \in Neighbors: qPP(grid[w][1], grid[w][2], grid[w][3])}),
-                  q, 1>> ]
+                  (* Remember v's previous state and advance its temporal synchronization. *)
+                  q, 1>> ] \* 1 = (0 + 1) % 3
+  (* v could update its visible state (r = 0) but some of its neighbors are at out of sync (r = 2). *)
   \/ /\ r = 0
-     /\ ~ ready(0, Neighbors) 
+     /\ ~ ready(0, Neighbors) \* \E w \in Neighbors: grid[w][3] = 2
      /\ grid' = [ grid EXCEPT ![v] = <<q, qP, 0>> ]
+  (* v is not allowed to change visible state but its neighbors are in sync. *)
   \/ /\ r \in {1,2}
      /\ ready(r, Neighbors)
-     /\ grid' = [ grid EXCEPT ![v] = <<q, qP, (r + 1) % 3>> ]
+     (* Advance v's temporal state. *)
+     /\ grid' = [ grid EXCEPT ![v] = <<q, qP, (r + 1) % 3>> ] \* (0 :> 1 @@ 1 :> 2 @@ 2 :> 0)
+  (* v cannot change visible state and neighhood is out of sync. *)
   \/ /\ r \in {1,2}
      /\ ~ ready(r, Neighbors)
      /\ UNCHANGED grid
