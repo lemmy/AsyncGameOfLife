@@ -1,11 +1,18 @@
 ------------------------ MODULE AsyncGameOfLifeAnim ------------------------
-EXTENDS SVG, SequencesExt, Toolbox, AsyncGameOfLife
+EXTENDS SVG, SequencesExt, Toolbox, AsyncGameOfLife, TLC
+
+\*CellColor(cell) == 
+\*  CASE cell[1] = TRUE /\ cell[2] = TRUE  -> "lightblue"
+\*    [] cell[1] = TRUE /\ cell[2] = FALSE -> "lightgray"
+\*    [] cell[1] =FALSE /\ cell[2] = TRUE  -> "yellow"
+\*    [] cell[1] =FALSE /\ cell[2] = FALSE -> "lightyellow"
 
 CellColor(cell) == 
-  CASE cell[1] = TRUE /\ cell[2] = TRUE  -> "lightblue"
-    [] cell[1] = TRUE /\ cell[2] = FALSE -> "lightgray"
-    [] cell[1] =FALSE /\ cell[2] = TRUE  -> "yellow"
-    [] cell[1] =FALSE /\ cell[2] = FALSE -> "lightyellow"
+  CASE cell[1] = TRUE /\ cell[2] =TRUE -> "lightblue"
+    [] cell[1] = TRUE /\ cell[2] =FALSE -> "yellow"
+    [] cell[1] =FALSE /\ cell[3] = 0 -> "lightgray"
+    [] cell[1] =FALSE /\ cell[3] = 1  -> "gray"
+    [] cell[1] =FALSE /\ cell[3] = 2 -> "darkgray"
 
 \* Gap between cells.
 AnimPos == [ x |-> 4, y |-> 4 ]
