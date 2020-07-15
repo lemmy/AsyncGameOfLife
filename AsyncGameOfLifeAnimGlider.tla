@@ -17,8 +17,7 @@ Inv ==
 \* https://github.com/tlaplus/tlaplus/issues/485
 Alias == 
   "anim" :> \* key can be anything (grep's regex below looks for svg start/end tag).
-  \* Size of viewBox has to be manually adjusted to the grid size (N).
-  "<svg viewBox='0 0 400 400'>" \o SVGElemToString(Group(Grid, <<>>)) \o "</svg>"
+  SVGElemToString(Svg(Grid, <<>>))
 
 =============================================================================
 
