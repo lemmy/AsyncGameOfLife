@@ -8,12 +8,12 @@ EXTENDS SVG, SequencesExt, Toolbox, AsyncGameOfLife, TLC
 \*    [] cell[1] =FALSE /\ cell[2] = FALSE -> "lightyellow"
 
 CellColor(cell) == 
-  CASE cell[1] = TRUE /\ cell[2] =TRUE -> "blue"
-    [] cell[1] = TRUE /\ cell[2] =FALSE -> "lightblue"
-    [] cell[1] =FALSE /\ cell[2] =TRUE -> "yellow"
-    [] cell[1] =FALSE /\ cell[3] = 0 -> "lightgray"
-    [] cell[1] =FALSE /\ cell[3] = 1  -> "gray"
-    [] cell[1] =FALSE /\ cell[3] = 2 -> "darkgray"
+  CASE cell[1] = TRUE /\ cell[2] =TRUE -> "blue"                      \* Alive cell for r \in {0,1}
+    [] cell[1] = TRUE /\ cell[2] =FALSE -> "lightblue"                \* Alive cell for r \in {0}
+    [] cell[1] =FALSE /\ cell[2] =TRUE -> "yellow"                    \* Alive cell for r \in {1}
+    [] cell[1] =FALSE /\ cell[2] =FALSE /\cell[3] = 0 -> "lightgray"  \* Dead cell for r = 0
+    [] cell[1] =FALSE /\ cell[2] =FALSE /\cell[3] = 1  -> "gray"      \* Dead cell for r = 1
+    [] cell[1] =FALSE /\ cell[2] =FALSE /\cell[3] = 2 -> "darkgray"   \* Dead cell for r = 2
 
 \* Gap between cells.
 AnimPos == [ x |-> 4, y |-> 4 ]
