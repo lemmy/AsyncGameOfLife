@@ -58,11 +58,6 @@ Init ==
 ready(r, Neighbors) == 
   \A w \in Neighbors: grid[w][3] # (r + 2) % 3 \* (0 :> 2 @@ 1 :> 0 @@ 2 :> 1)
 
-qPP(qw, qwP, rw) == 
-  CASE rw = 0 -> qw \* w in a state of form (q_w,qP_w,0)
-    [] rw = 1 -> qwP \* w in a state of form (q_w,qP_w,1)
-\*    [] OTHER -> FALSE \* Undefined
-
 (* Transition function from third page. *)
 deltaP(v, q, qP, r, Neighbors) ==
   \/ /\ r = 0
