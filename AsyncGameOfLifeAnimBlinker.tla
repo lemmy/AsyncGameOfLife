@@ -21,16 +21,13 @@ Alias ==
 
 ```bash
 /opt/toolbox/tla2tools.jar \
-    -simulate num=1 -depth 32001 \
-    -config AsyncGameOfLifeAnimBlinker.tla AsyncGameOfLifeAnimBlinker.tla \
-    | grep -o "<svg.*<\/svg>" > svg.out
-
-## Convert glider.out to a set of svg files (would prefer to somehow do this with grep).
-rm -rf animation && mkdir animation && awk '{print > "animation/"NR".svg"}' svg.out
+-simulate num=1 -depth 32001 \
+-config AsyncGameOfLifeAnimBlinker.tla AsyncGameOfLifeAnimBlinker.tla \
+| awk 'match($0,/<svg.*<\/svg>/) { n += 1; print substr($0,RSTART,RLENGTH) > n ".svg" }'
 
 ## Render set of svg files as mp4 video (ffmpeg has no support for piping it images yet).
 ## Replace "mp4" with "gif" to create an animated gif that can be posted on e.g. Twitter.
-ffmpeg -y -i animation/%d.svg AsyncGameOfLifeAnimBlinker_$(date +%s).mp4 && rm -rf animation
+ffmpeg -y -i %d.svg AsyncGameOfLifeAnimBlinker_$(date +%s).mp4 && rm *.svg
 
 ## Show generated animation.
 vlc AsyncGameOfLifeAnimBlinker_*.mp4
