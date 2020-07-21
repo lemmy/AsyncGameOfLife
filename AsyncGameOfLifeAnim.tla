@@ -1,5 +1,5 @@
 ------------------------ MODULE AsyncGameOfLifeAnim ------------------------
-EXTENDS SVG, SequencesExt, Toolbox, AsyncGameOfLife, TLC
+EXTENDS SVG, SequencesExt, Toolbox, AsyncGameOfLifeDistributed, TLC
 
 \*CellColor(cell) == 
 \*  CASE cell[1] = TRUE /\ cell[2] = TRUE  -> "lightblue"

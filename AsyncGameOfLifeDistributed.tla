@@ -37,7 +37,7 @@ Message == [ src: Pos, vote: Vote ]
 Network == INSTANCE Messaging WITH Processes <- Pos
 
 Init == 
-  /\ grid = [ pos \in Pos |-> IF pos \in {<<3,2>>,<<3,3>>,<<3,4>>}
+    /\ grid = [ pos \in Pos |-> IF pos \in {<<3,2>>,<<3,3>>,<<3,4>>}
                     THEN <<TRUE, TRUE, 0>>
                     ELSE <<FALSE, FALSE, 0>> ]
 \*    /\ grid = [ pos \in Pos |-> (BOOLEAN \X BOOLEAN \X R) ]
@@ -84,7 +84,7 @@ Next ==
                                 {<<w, [ src |-> v, 
                                         vote |-> 
                                           [ round |-> seqs[v]', 
-                                            state |-> <<grid[v][1]', grid[v][2]', grid[v][3]'>> ] ]>> : w \in Pos })
+                                            state |-> <<grid[v][1]', grid[v][2]', grid[v][3]'>> ] ]>> : w \in Neighbors })
                    \/ Network!Receive(v, Deliver)
 
 Spec == Init /\ [][Next]_vars

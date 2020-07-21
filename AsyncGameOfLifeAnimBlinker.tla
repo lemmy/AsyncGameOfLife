@@ -1,7 +1,7 @@
 ------------------------ CONFIG AsyncGameOfLifeAnimBlinker --------------------
 CONSTANT
-N <- BlinkerN
-SPECIFICATION Blinker
+N <- AnimN
+SPECIFICATION Spec
 INVARIANT Inv
 ALIAS Alias
 =============================================================================
@@ -9,8 +9,10 @@ ALIAS Alias
 ------------------------ MODULE AsyncGameOfLifeAnimBlinker --------------------
 EXTENDS AsyncGameOfLifeAnim
 
+AnimN == 5
+
 Inv ==
-  TLCGet("level") <2500
+  TLCGet("level") <3
 
 \* https://github.com/tlaplus/tlaplus/issues/485
 Alias == 
