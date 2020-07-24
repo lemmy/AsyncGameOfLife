@@ -1,15 +1,25 @@
 ------------------------ CONFIG AsyncGameOfLifeAnimGlider --------------------
 CONSTANT
-N <- AnimN
+N <- GliderN
 SPECIFICATION Glider
 INVARIANT Inv
 ALIAS Alias
 =============================================================================
 
+\* Glider
+\* https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#/media/File:Game_of_life_animated_glider.gif
 ------------------------ MODULE AsyncGameOfLifeAnimGlider --------------------
 EXTENDS AsyncGameOfLifeAnim
 
-AnimN == 8
+GliderN ==
+  5
+  
+Glider == 
+  \* From top-left.
+  /\ grid = [ pos \in Pos |-> IF pos \in {<<1,3>>,<<2,1>>,<<2,3>>,<<3,2>>,<<3,3>>}
+                    THEN <<TRUE, TRUE, 0>>
+                    ELSE <<FALSE, FALSE, 0>> ]
+  /\ [][Next]_vars
 
 Inv ==
   TLCGet("level") < 14000

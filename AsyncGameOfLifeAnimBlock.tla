@@ -1,47 +1,40 @@
------------------------- CONFIG AsyncGameOfLifeAnimBlinker --------------------
+------------------------ CONFIG AsyncGameOfLifeAnimBlock --------------------
 CONSTANT
-N <- BlinkerN3
-SPECIFICATION BlinkerSpecN3
+N <- BlockN
+SPECIFICATION Block
 INVARIANT Inv
 ALIAS Alias
 =============================================================================
 
 \* Oscillators
 \* https://en.wikipedia.org/wiki/File:Game_of_life_blinker.gif
------------------------- MODULE AsyncGameOfLifeAnimBlinker --------------------
+------------------------ MODULE AsyncGameOfLifeAnimBlock --------------------
 EXTENDS AsyncGameOfLifeAnim
 
-BlinkerN3 ==
-    3 
 
-BlinkerN5 ==
-    5
+\* https://en.wikipedia.org/wiki/File:Game_of_life_block_with_border.svg
+BlockN == 
+  4
   
-BlinkerSpecN3 ==
-    /\ grid = [ pos \in Pos |-> IF pos \in {<<1,2>>,<<2,2>>,<<3,2>>}
-                    THEN <<TRUE, TRUE, 0>>
-                    ELSE <<FALSE, FALSE, 0>> ]
-  /\ [][Next]_vars
-
-BlinkerSpecN5 ==
-  /\ grid = [ pos \in Pos |-> IF pos \in {<<3,2>>,<<3,3>>,<<3,4>>}
+Block ==
+   /\ grid = [pos \in Pos |-> IF pos \in {<<2,2>>,<<2,3>>,<<3,2>>,<<3,3>>}
                    THEN <<TRUE, TRUE, 0>>
-                   ELSE <<FALSE, FALSE, 0>> ]
+                   ELSE <<FALSE, FALSE, 0>>]  
   /\ [][Next]_vars
-
-\* In an ordinay Cellular Automata it would be easy to formulate
-\* an invariant for oscillators (list of valid grid states). With
-\* the asynchronous CA the state changes in "waves", which makes it
-\* tedious to enumerate all valid grid states).  This is why the
-\* invariant below is not as strong as it should be (it only 
-\* checks quiescent cells but ignores cells that oscillate.
-BlinkerInvN5 == 
-  \/ /\ \A pos \in Pos \ 
-                    {<<3,2>>,<<3,3>>,<<3,4>>,  \* horizontal
-                     <<2,3>>,<<3,3>>,<<4,3>>}: \* vertical
+                   
+\* r keeps changing, but q doesn't because Block is a still life.
+BlockInv ==
+  /\ \A pos \in Pos \ {<<2,2>>,<<2,3>>,<<3,2>>,<<3,3>>}:
           /\ grid[pos][1] = FALSE
           /\ grid[pos][2] = FALSE
           /\ grid[pos][3] \in R
+  /\ \A pos \in {<<2,2>>,<<2,3>>,<<3,2>>,<<3,3>>}:
+          /\ grid[pos][1] = TRUE
+          /\ grid[pos][2] = TRUE
+          /\ grid[pos][3] \in R
+
+BlockDiameter == 
+  31
 
 Inv ==
   TLCGet("level") < 20000
