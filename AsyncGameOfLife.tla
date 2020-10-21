@@ -69,18 +69,18 @@ deltaP(v, q, qP, r, Neighbors) ==
                   (* Remember v's previous state and advance its temporal synchronization. *)
                   q, 1>> ] \* 1 = (0 + 1) % 3
   (* v could update its visible state (r = 0) but some of its neighbors are at out of sync (r = 2). *)
-  \/ /\ r = 0
-     /\ ~ ready(0, Neighbors) \* \E w \in Neighbors: grid[w][3] = 2
-     /\ UNCHANGED grid
+\*  \/ /\ r = 0
+\*     /\ ~ ready(0, Neighbors) \* \E w \in Neighbors: grid[w][3] = 2
+\*     /\ UNCHANGED grid
   (* v is not allowed to change visible state but its neighbors are in sync. *)
   \/ /\ r \in {1,2}
      /\ ready(r, Neighbors)
      (* Advance v's temporal state. *)
      /\ grid' = [ grid EXCEPT ![v] = <<q, qP, (r + 1) % 3>> ] \* (0 :> 1 @@ 1 :> 2 @@ 2 :> 0)
   (* v cannot change visible state and neighhood is out of sync. *)
-  \/ /\ r \in {1,2}
-     /\ ~ ready(r, Neighbors)
-     /\ UNCHANGED grid
+\*  \/ /\ r \in {1,2}
+\*     /\ ~ ready(r, Neighbors)
+\*     /\ UNCHANGED grid
 
 Next ==
   \E v \in Pos: /\ deltaP(v, grid[v][1], grid[v][2], grid[v][3], nbhd(v))
@@ -93,5 +93,40 @@ Spec == Init /\ [][Next]_vars
 \* prevent races in value instances during model-checking.
 \*SomeConfiguration ==
 \*  CHOOSE init \in [Pos -> ({TRUE} \X {FALSE} \X R)] : TRUE
+
+
+BlinkerN3 ==
+    3 
+  
+BlinkerSpecN3 ==
+    /\ grid = [ pos \in Pos |-> IF pos \in {<<1,2>>,<<2,2>>,<<3,2>>}
+                    THEN <<TRUE, TRUE, 0>>
+                    ELSE <<FALSE, FALSE, 0>> ]
+    \* /\ Network!Init
+    \* /\ msgs = [ pos \in Pos |-> {[ src |-> v, state |-> <<grid[v][1], grid[v][2], grid[v][3]>> ] : v \in nbhd(pos)} ]
+  /\ [][Next]_vars
+
+BlinkerN5 ==
+    5
+
+BlinkerSpecN5 ==
+  /\ grid = [ pos \in Pos |-> IF pos \in {<<3,2>>,<<3,3>>,<<3,4>>}
+                   THEN <<TRUE, TRUE, 0>>
+                   ELSE <<FALSE, FALSE, 0>> ]
+  /\ [][Next]_vars
+
+\* In an ordinay Cellular Automata it would be easy to formulate
+\* an invariant for oscillators (list of valid grid states). With
+\* the asynchronous CA the state changes in "waves", which makes it
+\* tedious to enumerate all valid grid states).  This is why the
+\* invariant below is not as strong as it should be (it only 
+\* checks quiescent cells but ignores cells that oscillate.
+BlinkerInvN5 == 
+  \/ /\ \A pos \in Pos \ 
+                    {<<3,2>>,<<3,3>>,<<3,4>>,  \* horizontal
+                     <<2,3>>,<<3,3>>,<<4,3>>}: \* vertical
+          /\ grid[pos][1] = FALSE
+          /\ grid[pos][2] = FALSE
+          /\ grid[pos][3] \in R
 
 =============================================================================

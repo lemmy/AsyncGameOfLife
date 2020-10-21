@@ -1,8 +1,10 @@
 ------------------------ CONFIG AsyncGameOfLifeAnimBlinker --------------------
 CONSTANT
 N <- BlinkerN3
+null = "null"
 SPECIFICATION BlinkerSpecN3
 INVARIANT Inv
+\* PROPERTIES AgolSpec
 ALIAS Alias
 =============================================================================
 
@@ -21,6 +23,8 @@ BlinkerSpecN3 ==
     /\ grid = [ pos \in Pos |-> IF pos \in {<<1,2>>,<<2,2>>,<<3,2>>}
                     THEN <<TRUE, TRUE, 0>>
                     ELSE <<FALSE, FALSE, 0>> ]
+    \* /\ Network!Init
+    \* /\ msgs = [ pos \in Pos |-> {[ src |-> v, state |-> <<grid[v][1], grid[v][2], grid[v][3]>> ] : v \in nbhd(pos)} ]
   /\ [][Next]_vars
 
 BlinkerSpecN5 ==
@@ -44,7 +48,7 @@ BlinkerInvN5 ==
           /\ grid[pos][3] \in R
 
 Inv ==
-  TLCGet("level") < 20000
+   TLCGet("level") < 20000
 
 \* https://github.com/tlaplus/tlaplus/issues/485
 Alias == 

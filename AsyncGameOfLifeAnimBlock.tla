@@ -20,7 +20,11 @@ Block ==
    /\ grid = [pos \in Pos |-> IF pos \in {<<2,2>>,<<2,3>>,<<3,2>>,<<3,3>>}
                    THEN <<TRUE, TRUE, 0>>
                    ELSE <<FALSE, FALSE, 0>>]  
-  /\ [][Next]_vars
+    \* This is a node's in-process message set
+   /\ msgs  = [ pos \in Pos |-> {[ src |-> v, state |-> <<grid[v][1], grid[v][2], grid[v][3]>> ] : v \in nbhd(pos)} ]
+    \* The network underlying the nodes. We expect reliable delivery (no messages get lost).
+   /\ Network!Init
+   /\ [][Next]_vars
                    
 \* r keeps changing, but q doesn't because Block is a still life.
 BlockInv ==
