@@ -27,10 +27,8 @@ nbhd(v) ==
 (* Original local transition function from the second page and 
    GameOfLife.tla. *)
 delta(b, liveNbgrs) ==
-  IF \/  (b /\ Cardinality(liveNbgrs) \in {2, 3})
-     \/ (~b /\ Cardinality(liveNbgrs) = 3)
-  THEN TRUE
-  ELSE FALSE
+  \/  (b /\ Cardinality(liveNbgrs) \in {2, 3})
+  \/ (~b /\ Cardinality(liveNbgrs) = 3)
 
 qPP(qw, qwP, rw) == 
   CASE rw = 0 -> qw \* w in a state of form (q_w,qP_w,0)

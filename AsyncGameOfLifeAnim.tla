@@ -1,5 +1,7 @@
 ------------------------ MODULE AsyncGameOfLifeAnim ------------------------
-EXTENDS SVG, SequencesExt, Toolbox, TLC, AsyncGameOfLife\*Distributed
+EXTENDS SVG
+
+CONSTANT G
 
 \*CellColor(cell) == 
 \*  CASE cell[1] = TRUE /\ cell[2] = TRUE  -> "lightblue"
@@ -29,13 +31,29 @@ Grid ==
               coordinate[2] * (GAnimPos.h + AnimPos.y), 
               GAnimPos.w, 
               GAnimPos.h, 
-              [fill |-> CellColor(grid[coordinate]) ]),
+              [fill |-> CellColor(G[coordinate]) ]),
          Text(coordinate[1] * (GAnimPos.w + AnimPos.x),
               coordinate[2] * (GAnimPos.h + AnimPos.y),
-              ToString(grid[coordinate][3]), [font |-> "Arial"])>>, <<>>) : 
-                          coordinate \in DOMAIN grid })
+              ToString(G[coordinate][3]), [font |-> "Arial"])>>, <<>>) : 
+                          coordinate \in DOMAIN G })
 
 \* Grid converted to SVG.
 Animation == SVGElemToString(Group(Grid, <<>>))
 
+Alias == 
+  "anim" :> \* key can be anything (grep's regex below looks for svg start/end tag).
+  "<svg viewBox='0 0 300 300'>" \o Animation \o "</svg>"
+
 =============================================================================
+
+```bash
+/opt/toolbox/tla2tools.jar \
+-simulate num=1 -depth 32001 \
+-config AsyncGameOfLifeDistributed.tla AsyncGameOfLifeDistributed.tla \
+| awk 'match($0,/<svg.*<\/svg>/) { n += 1; print substr($0,RSTART,RLENGTH) > n ".svg" }'
+
+
+## Render set of svg files as mp4 video (ffmpeg has no support for piping it images yet).
+## Replace "mp4" with "gif" to create an animated gif that can be posted on e.g. Twitter.
+ffmpeg -y -i %d.svg AsyncGameOfLifeDistributed$(date +%s).mp4 && rm *.svg
+```
