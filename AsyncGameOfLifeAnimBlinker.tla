@@ -11,7 +11,7 @@ ALIAS Alias
 \* Oscillators
 \* https://en.wikipedia.org/wiki/File:Game_of_life_blinker.gif
 ------------------------ MODULE AsyncGameOfLifeAnimBlinker --------------------
-EXTENDS AsyncGameOfLifeAnim
+EXTENDS AsyncGameOfLife
 
 BlinkerN3 ==
     3 
@@ -47,13 +47,14 @@ BlinkerInvN5 ==
           /\ grid[pos][2] = FALSE
           /\ grid[pos][3] \in R
 
-Inv ==
-   TLCGet("level") < 20000
+\*Inv ==
+\*   TLCGet("level") < 20000
 
 \* https://github.com/tlaplus/tlaplus/issues/485
-Alias == 
-  "anim" :> \* key can be anything (grep's regex below looks for svg start/end tag).
-  "<svg viewBox='0 0 300 300'>" \o SVGElemToString(Group(Grid, <<>>)) \o "</svg>"
+\*INSTANCE AsyncGameOfLifeAnim
+\*Alias == 
+\*  "anim" :> \* key can be anything (grep's regex below looks for svg start/end tag).
+\*  "<svg viewBox='0 0 300 300'>" \o SVGElemToString(Group(Grid, <<>>)) \o "</svg>"
 
 =============================================================================
 

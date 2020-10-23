@@ -1,19 +1,21 @@
-* msgs is defined for all pos \in Pos in the initial state.  What we want
-  is to let a pos send messages depending on its state.
-  
-* How to visualize the global state in a distributed *execution*? 
-
-* Variables grid, msgs, ... model the *global* state of the computation
-  and we are either clever and map this implicitly to a node's local state,
-  or we re-write the high-level spec to better encapsulate the local state.
-
+\** msgs is defined for all pos \in Pos in the initial state.  What we want
+\*  is to let a pos send messages depending on its state.
+\*  
+\** How to visualize the global state in a distributed *execution*? 
+\*
+\** Variables grid, msgs, ... model the *global* state of the computation
+\*  and we are either clever and map this implicitly to a node's local state,
+\*  or we re-write the high-level spec to better encapsulate the local state.
+\*
 --------------------- MODULE AsyncGameOfLifeDistributed ---------------------
 EXTENDS Integers,
-        FiniteSets,
-        Sequences
+        FiniteSets, TLCExt
 
-CONSTANT N \* Size of the *square* grid.
-ASSUME N \in Nat /\ N > 1
+BOOLS == {TRUE, FALSE} \* PlusPy's parser doesn't know BOOLEAN yet.
+
+\*CONSTANT N \* Size of the *square* grid.
+\*ASSUME N \in Nat /\ N > 1
+N == 3
 
 null == CHOOSE x : x \notin Nat
 
@@ -30,12 +32,15 @@ Pos ==
    neighbors as defined by [Moore neighborhood](https://en.wikipedia.org/wiki/Moore_neighborhood) *)
 nbhd(v) ==
   LET moore == {x \in {-1, 0, 1} \X {-1, 0, 1} : x /= <<0, 0>>}
-      points == {<<v[1] + x, v[2] + y>> : <<x, y>> \in moore}
+      points == {<<v[1] + m[1], v[2] + m[2]>> : m \in moore}
   IN { p \in points : /\ p[1] # 0 /\ p[2] # 0  
                       /\ p[1]<= N /\ p[2]<= N }
 
-CONSTANT P  \* Some initial pattern (blinker, glider, block, ...).
-ASSUME P \in [Pos -> (BOOLEAN \X BOOLEAN \X R)]
+\*CONSTANT P  \* Some initial pattern (blinker, glider, block, ...).
+\*ASSUME P \in [Pos -> (BOOLS \X BOOLS \X R)]
+P == [ pos \in Pos |-> IF pos \in {<<1,2>>,<<2,2>>,<<3,2>>}
+                       THEN <<TRUE, TRUE, 0>>
+                       ELSE <<FALSE, FALSE, 0>> ]
 
 -------------------------------------------------------------------------------
 
@@ -48,7 +53,7 @@ VARIABLES grid, msgs, mi
 vars == <<grid, msgs, mi>>
 
 \* Network related (type of messages, payload, ...).
-Message == [ src: Pos, state: (BOOLEAN \X BOOLEAN \X R) ]
+Message == [ src: Pos, state: (BOOLS \X BOOLS \X R) ]
 Network == INSTANCE Messaging WITH Processes <- Pos
 
 -------------------------------------------------------------------------------
@@ -58,13 +63,13 @@ TypeOK ==
   (* 2. component of a cell is the cell's previous (visible) state.          *)
   (* 3. component of a cell is the cell's temporal state (synchronization).  *)
   (* (see "Temporal Waves" section on page 4 for temporal synchronization)   *)
-  /\ grid \in [Pos -> (BOOLEAN \X BOOLEAN \X R)]
+  /\ grid \in [Pos -> (BOOLS \X BOOLS \X R)]
   (* Each node has one inbox for each of its neighbors and the message in    *)
   (* the inbox is the last known state of that neighbor or null.             *)
   /\ \A pos \in Pos : 
               /\ DOMAIN msgs[pos] = nbhd(pos)
               /\ \A n \in nbhd(pos):
-                   msgs[pos][n] \in ((BOOLEAN \X BOOLEAN \X R) \cup {null})
+                   msgs[pos][n] \in ((BOOLS \X BOOLS \X R) \cup {null})
   \* Variable "mi" is not ours but the Network's responsibility.
 
 -------------------------------------------------------------------------------
@@ -73,7 +78,7 @@ Init ==
     /\ grid = P
     \* Non-deterministically initialize grid from the set of *all* initial states,
     \* re-define in your model for a particular configuration,i.e. Blinker, ...!
-    /\ grid \in [ Pos -> (BOOLEAN \X BOOLEAN \X R) ]
+\*    /\ grid \in [ Pos -> (BOOLS \X BOOLS \X R) ]
     /\ msgs = [ pos \in Pos |->
                     [ v \in nbhd(pos) |-> <<grid[v][1], grid[v][2], grid[v][3]>> ] ]
     \* The network underlying the nodes with reliable message delivery guarantees.
@@ -92,7 +97,7 @@ Deliver(p, m) ==
       \* execution level it is conceivable that a node receives a message
       \* from a faulty node that's not in its neighborhood.
       /\ m.src \notin nbhd(p)
-      /\ UNCHANGED <<msgs, grid>>    
+      /\ UNCHANGED <<msgs, grid>>  
 
 -------------------------------------------------------------------------------
 
@@ -114,7 +119,10 @@ qPP(qw, qwP, rw) ==
 -------------------------------------------------------------------------------
 
 Next == 
-  /\ \E v \in Pos: \/ LET q  == grid[v][1]
+  /\ \E v \in Pos: 
+                  \/ 
+\*                  IF 
+                      LET q  == grid[v][1]
                           qP == grid[v][2]
                           r  == grid[v][3]
                       IN \* A node is ready iff it has a consistent view of its neighborhood nodes/cells.
@@ -137,6 +145,7 @@ Next ==
                          \* Broadcast/multicast/unicast state of this node to its neighbors.
                          /\ Network!Send(
                                 {<<w, [ src |-> v, state |-> <<grid[v][1]', grid[v][2]', grid[v][3]'>> ]>> : w \in nbhd(v) })
+\*                   THEN TRUE ELSE Network!Receive(v, Deliver)
                    \* Receive packets from the NIC and deliver a high-level message to a node's inbox.
                    \/ Network!Receive(v, Deliver)
 
@@ -148,7 +157,7 @@ Spec == Init /\ [][Next]_vars
 Agol == INSTANCE AsyncGameOfLife
 AgolSpec == Agol!Spec
 
-THEOREM Spec => AgolSpec OBVIOUS
+THEOREM Spec => AgolSpec
 
 -------------------------------------------------------------------------------
 
@@ -157,6 +166,6 @@ THEOREM Spec => AgolSpec OBVIOUS
    the following would be defined as an alias in the model:
       LET Anim == INSTANCE AsyncGameOfLifeAnim WITH G <- grid
       IN Anim!Alias                                                            *)
-Anim == INSTANCE AsyncGameOfLifeAnim WITH G <- grid
+\*Anim == INSTANCE AsyncGameOfLifeAnim WITH G <- grid
 
 =============================================================================

@@ -20,7 +20,7 @@ Pos ==
 \* \A v \in Pos: nbhd(v) \in SUBSET Pos
 nbhd(v) ==
   LET moore == {x \in {-1, 0, 1} \X {-1, 0, 1} : x /= <<0, 0>>}
-      points == {<<v[1] + x, v[2] + y>> : <<x, y>> \in moore}
+      points == {<<v[1] + m[1], v[2] + m[2]>> : m \in moore}
   IN { p \in points : /\ p[1] # 0 /\ p[2] # 0   \* Filter out all neighbors
                       /\ p[1]<= N /\ p[2]<= N } \* that are off the grid.
 
@@ -33,7 +33,7 @@ delta(b, liveNbgrs) ==
 qPP(qw, qwP, rw) == 
   CASE rw = 0 -> qw \* w in a state of form (q_w,qP_w,0)
     [] rw = 1 -> qwP \* w in a state of form (q_w,qP_w,1)
-\*    [] OTHER -> FALSE \* Undefined
+    [] OTHER -> FALSE \* Undefined
 
 \* Topology modeled as a 2D grid with Moore neighborhood without
 \* "wrap around". We don't model the general case (yet?) where
@@ -96,6 +96,12 @@ Spec == Init /\ [][Next]_vars
 BlinkerN3 ==
     3 
   
+BlinkerInitN3 == 
+    grid = [ pos \in Pos |-> IF pos \in {<<1,2>>,<<2,2>>,<<3,2>>}
+                       THEN <<TRUE, TRUE, 0>>
+                       ELSE <<FALSE, FALSE, 0>> ]
+
+====
 BlinkerSpecN3 ==
     /\ grid = [ pos \in Pos |-> IF pos \in {<<1,2>>,<<2,2>>,<<3,2>>}
                     THEN <<TRUE, TRUE, 0>>
@@ -126,5 +132,3 @@ BlinkerInvN5 ==
           /\ grid[pos][1] = FALSE
           /\ grid[pos][2] = FALSE
           /\ grid[pos][3] \in R
-
-=============================================================================
