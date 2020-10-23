@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="." path="."/>
+	<classpathentry combineaccessrules="false" kind="src" path="/tlatools"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/azure-1.36.3.jar"/>
+	<classpathentry kind="lib" path="lib/azure-storage-8.6.5.jar"/>
+	<classpathentry kind="lib" path="lib/azure-servicebus-3.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.30.jar"/>
+	<classpathentry kind="lib" path="lib/async-http-client-2.12.1.jar"/>
+	<classpathentry kind="lib" path="lib/proton-j-0.33.6.jar"/>
+	<classpathentry kind="output" path="."/>
+</classpath>
