@@ -121,7 +121,10 @@ qPP(qw, qwP, rw) ==
 Next == 
   /\ \E v \in Pos: 
                   \/ 
-\*                  IF 
+\*                  IF \* Breaking non-determinism with IF-THEN-ELSE at the spec-level fails because 
+                       \* TLC evaluates the conditional of ITE not in the scope where it can generate
+                       \* states, i.e. just constant and state-level expression (unless the successor
+                       \* state is already fully defined).
                       LET q  == grid[v][1]
                           qP == grid[v][2]
                           r  == grid[v][3]
