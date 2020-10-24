@@ -118,8 +118,11 @@ qPP(qw, qwP, rw) ==
 
 -------------------------------------------------------------------------------
 
+CONSTANT O \* Others, the set of remote nodes. Define to be {} to run model locally.
+ASSUME O \subseteq Pos
+
 Next == 
-  /\ \E v \in Pos: 
+  /\ \E v \in (Pos \ O): 
                   \/ 
 \*                  IF \* Breaking non-determinism with IF-THEN-ELSE at the spec-level fails because 
                        \* TLC evaluates the conditional of ITE not in the scope where it can generate
