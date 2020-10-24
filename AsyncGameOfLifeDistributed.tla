@@ -9,7 +9,7 @@
 \*
 --------------------- MODULE AsyncGameOfLifeDistributed ---------------------
 EXTENDS Integers,
-        FiniteSets, TLCExt
+        FiniteSets
 
 BOOLS == {TRUE, FALSE} \* PlusPy's parser doesn't know BOOLEAN yet.
 
