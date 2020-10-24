@@ -37,7 +37,9 @@
     <intAttribute key="modelEditorOpenTabs" value="14"/>
     <stringAttribute key="modelExpressionEval" value=""/>
     <stringAttribute key="modelParameterActionConstraint" value=""/>
-    <listAttribute key="modelParameterConstants"/>
+    <listAttribute key="modelParameterConstants">
+        <listEntry value="O;;{&lt;&lt;1,3&gt;&gt;,&lt;&lt;2,3&gt;&gt;,&lt;&lt;3,2&gt;&gt;,&lt;&lt;3,3&gt;&gt;};0;0"/>
+    </listAttribute>
     <stringAttribute key="modelParameterContraint" value=""/>
     <listAttribute key="modelParameterDefinitions">
         <listEntry value="null;;null;1;0"/>

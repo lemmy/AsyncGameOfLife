@@ -1,28 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2020 Microsoft Research. All rights reserved. 
- *
- * The MIT License (MIT)
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy 
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software. 
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * Contributors:
- *   Markus Alexander Kuppe - initial API and implementation
- ******************************************************************************/
+package tlc2.overrides;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -55,8 +31,8 @@ import util.UniqueString;
 // https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-messages-payloads
 public class Messaging implements IMessageHandler {
 
-//	@TLAPlusOperator(identifier = "SendAll", module = "Messaging", warn = false)
-	public static IValue SendAll(final Value mi, final SetEnumValue msgs) {
+	@TLAPlusOperator(identifier = "SendAll", module = "Messaging", warn = false)
+	public static IValue sendAll(final Value mi, final SetEnumValue msgs) {
 		// TODO Move serialization here from out of post. This allows to check if the
 		// elements of msgs are tuples of dst/payload.  Once all are converted into
 		// the format expected by IMessage, they can be send off with
@@ -73,8 +49,8 @@ public class Messaging implements IMessageHandler {
 	// TLCRuntimeException and claim that "In evaluation, the identifier someVar is 
 	// either undefined or not an operator".
 
-//	@TLAPlusOperator(identifier = "WaitForMessage", module = "Messaging", warn = false)
-	public static IValue WaitForMessage(final Value mi, final Value p) {
+	@TLAPlusOperator(identifier = "WaitForMessage", module = "Messaging", warn = false)
+	public static IValue waitForMessage(final Value mi, final Value p) {
 		// This is a no-op, because NextMessage(mi, p) takes care of blocking.
 //		return BoolValue.ValTrue;
 		if (getInstance().enabled()) {
@@ -83,14 +59,14 @@ public class Messaging implements IMessageHandler {
 		return BoolValue.ValFalse;
 	}
 
-//	@TLAPlusOperator(identifier = "NextMessage", module = "Messaging", warn = false)
-	public static IValue NextMessage(final Value mi, final Value p) {
+	@TLAPlusOperator(identifier = "NextMessage", module = "Messaging", warn = false)
+	public static IValue nextMessage(final Value mi, final Value p) {
 		// receive blocks until an IValue is available.
 		return getInstance().receive();
 	}
 	
-//	@TLAPlusOperator(identifier = "DeliveredMessage", module = "Messaging", warn = false)
-	public static IValue DeliveredMessage(final Value mi, final Value p) {
+	@TLAPlusOperator(identifier = "DeliveredMessage", module = "Messaging", warn = false)
+	public static IValue deliveredMessage(final Value mi, final Value p) {
 		// This translates into mi' = mi, i.e. UNCHANGED mi.
 		return mi;
 	}
