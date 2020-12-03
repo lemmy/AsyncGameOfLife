@@ -7,6 +7,8 @@
 \*  and we are either clever and map this implicitly to a node's local state,
 \*  or we re-write the high-level spec to better encapsulate the local state.
 \*
+\begin{document}
+\begin{tla}
 --------------------- MODULE AsyncGameOfLifeDistributed ---------------------
 EXTENDS Integers,
         FiniteSets
@@ -44,6 +46,11 @@ P == [ pos \in Pos |-> IF pos \in {<<1,2>>,<<2,2>>,<<3,2>>}
 
 -------------------------------------------------------------------------------
 
+CONSTANT O \* Others, the set of remote nodes. Define to be {} to run model locally.
+ASSUME O \subseteq Pos
+
+-------------------------------------------------------------------------------
+
 (* Each cell (pos) of the grid represents a node in the distributed system. 
    An individual node does *not* have a consistent view of the state of the
    grid.  A node has a local set of messages and a messaging interface. 
@@ -54,7 +61,7 @@ vars == <<grid, msgs, mi>>
 
 \* Network related (type of messages, payload, ...).
 Message == [ src: Pos, state: (BOOLS \X BOOLS \X R) ]
-Network == INSTANCE Messaging WITH Processes <- Pos
+Network == INSTANCE Messaging WITH Processes <- Pos, Locals <- (Pos \ O)
 
 -------------------------------------------------------------------------------
 
@@ -118,9 +125,6 @@ qPP(qw, qwP, rw) ==
 
 -------------------------------------------------------------------------------
 
-CONSTANT O \* Others, the set of remote nodes. Define to be {} to run model locally.
-ASSUME O \subseteq Pos
-
 Next == 
   /\ \E v \in (Pos \ O): 
                   \/ 
@@ -150,7 +154,7 @@ Next ==
                                        ELSE msgs[pos] ]
                          \* Broadcast/multicast/unicast state of this node to its neighbors.
                          /\ Network!Send(
-                                {<<w, [ src |-> v, state |-> <<grid[v][1]', grid[v][2]', grid[v][3]'>> ]>> : w \in nbhd(v) })
+                                {<<v, w, [ src |-> v, state |-> <<grid[v][1]', grid[v][2]', grid[v][3]'>> ]>> : w \in nbhd(v) })
 \*                   THEN TRUE ELSE Network!Receive(v, Deliver)
                    \* Receive packets from the NIC and deliver a high-level message to a node's inbox.
                    \/ Network!Receive(v, Deliver)
@@ -163,7 +167,7 @@ Spec == Init /\ [][Next]_vars
 Agol == INSTANCE AsyncGameOfLife
 AgolSpec == Agol!Spec
 
-THEOREM Spec => AgolSpec
+THEOREM Spec => AgolSpec OBVIOUS
 
 -------------------------------------------------------------------------------
 
@@ -172,6 +176,8 @@ THEOREM Spec => AgolSpec
    the following would be defined as an alias in the model:
       LET Anim == INSTANCE AsyncGameOfLifeAnim WITH G <- grid
       IN Anim!Alias                                                            *)
-\*Anim == INSTANCE AsyncGameOfLifeAnim WITH G <- grid
+Anim == INSTANCE AsyncGameOfLifeAnim WITH G <- grid
 
 =============================================================================
+\end{tla}
+\end{document}

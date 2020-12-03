@@ -49,3 +49,15 @@ vlc AsyncGameOfLifeAnimGlider_*.mp4
 
 ## Convert mp4 to gif so that it can be posted on twitter.
 #ffmpeg -ss 30 -t 3 -i input.mp4 -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
+
+--------------------------------------------------------------------------------
+
+LET Foo(S) == { subsets \in SUBSET (UNION S) : 
+     /\ Cardinality(subsets) = Cardinality(S) 
+     /\ \A s \in S: \E e \in subsets: e \in s
+     
+ }
+ Choice(Sets) == { f \in [Sets -> UNION Sets] : \A S \in Sets : f[S] \in S }
+ Range(f) == { f[x] : x \in DOMAIN f }
+ Shuffle(Sets) == { Range(f) : f \in Choice(Sets) }
+IN Shuffle({{1,2}, {3,4}, {4,5}})

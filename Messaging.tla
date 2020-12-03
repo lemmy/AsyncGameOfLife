@@ -4,7 +4,8 @@
 
 LOCAL INSTANCE Naturals
 LOCAL INSTANCE Sequences
-CONSTANT Processes, Message
+CONSTANT Processes, Locals, Message
+ASSUME Locals \subseteq Processes
 VARIABLE mi
 
 \*++:SPEC
@@ -13,21 +14,21 @@ VARIABLE mi
 \* It is a map of processes to queues of undelivered messages
 LOCAL TypeInvariant == mi \in [Processes -> Seq(Message)]
 
-LOCAL InitialState(procs) == [ p \in procs |-> <<>> ]
+LOCAL InitialState(procs, locals) == [ p \in procs |-> <<>> ]
 
 \* Initially no messages are undelivered
-Init == mi = InitialState(Processes)
+Init == mi = InitialState(Processes, Locals)
 
 \* Function takes intf, the state of the messaging interface, and msgs, a
 \* set of << destination, message >> pairs, and updates the state by adding
 \* the message to the right (destination) queue of undelivered messages.
 LOCAL doSend[intf \in [Processes -> Seq(Message)],
              msgs \in SUBSET 
-                 {<<proc, msg>> : proc \in Processes, msg \in Message}] ==
+                 {<<src, dst, msg>> : src \in Processes, dst \in Processes, msg \in Message}] ==
     IF msgs = {} THEN intf
     ELSE
         LET m == CHOOSE m \in msgs : TRUE
-        IN doSend[[intf EXCEPT ![m[1]] = Append(@, m[2])], msgs \ {m}]
+        IN doSend[[intf EXCEPT ![m[2]] = Append(@, m[3])], msgs \ {m}]
 
 \* Helper operator for Send()
 LOCAL SendAll(intf, msgs) == doSend[intf, msgs]
